@@ -4,18 +4,37 @@ import { useState, useRef, useEffect } from "react";
 import { Send, Sparkles, RotateCcw } from "lucide-react";
 import MessageBubble from "./MessageBubble";
 import TypingIndicator from "./TypingIndicator";
+import PropertyCard from "./PropertyCard";
+
+interface Property {
+  id: number | null;
+  titulo: string;
+  tipo: string;
+  operacion: string;
+  precio: number | null;
+  moneda: string;
+  ambientes: number | null;
+  banos: number | null;
+  cocheras: number | null;
+  superficie_total: number | null;
+  direccion: string;
+  zona: string;
+  foto: string | null;
+  url: string;
+}
 
 interface Message {
   id: string;
   role: "user" | "bot";
   content: string;
+  properties?: Property[];
 }
 
 const suggestions = [
-  "Busca contactos en Buenos Aires",
-  "¿Cuantos contactos nuevos hay esta semana?",
-  "Muestra los contactos del sector inmobiliario",
-  "Actualiza el email de Juan Garcia",
+  "Busca departamentos en alquiler",
+  "Casas en venta en Centro",
+  "Departamentos de 2 ambientes",
+  "Propiedades en USD",
 ];
 
 export default function Chat() {
@@ -66,6 +85,7 @@ export default function Chat() {
           id: `bot-${Date.now()}`,
           role: "bot",
           content: data.message,
+          properties: data.properties,
         },
       ]);
     } catch {
@@ -132,7 +152,16 @@ export default function Chat() {
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-gray-50/50 chat-messages">
         {messages.map((msg) => (
-          <MessageBubble key={msg.id} role={msg.role} content={msg.content} />
+          <div key={msg.id}>
+            <MessageBubble role={msg.role} content={msg.content} />
+            {msg.properties && msg.properties.length > 0 && (
+              <div className="mt-3 flex gap-3 overflow-x-auto pb-2">
+                {msg.properties.map((p) => (
+                  <PropertyCard key={p.id} property={p} />
+                ))}
+              </div>
+            )}
+          </div>
         ))}
 
         {/* Suggestions */}
